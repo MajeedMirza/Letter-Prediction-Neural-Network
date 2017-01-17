@@ -1,40 +1,53 @@
 import numpy as np
 import re
 
-testing = True
-testString = "abcdefghijklmnopqrstuvwxyz "
-#with open('FILEPATH.txt', 'r') as myfile:
-#    testString=myfile.read()
+testing = True #Set to false to input your own string
+testStringC = "abcdefghijklmnopqrstuvwxyz "
+testStringW = "This is a test to see if this works, this is a test, a test, test"
+testPath = "" #If text file path is entered will use this text instead of test string
 alphabet = []
 alphaSize = 0
 inputs = []
 inputMatrix = []
 npWeights = np.array([])
-trainNum = 100
-pOccurences = -1
+trainNum = 100 #Used to increase or decrease number of times trained from the same text
+pOccurrences = 0 #Only print if the number of occurrences is greater than pOccurrences
 readW = True
+np.random.seed(123)
+
 
 def main():
     setCorW()
     inputStr = "  "
     if testing == True:
-
-        print("Testing is on, therefore learning from predefined string: \n" + testString + "\n")
+        if readW == True:
+            if testPath != "":
+                with open(testPath, 'r') as myfile:
+                    inputStr = myfile.read()
+            else:
+                inputStr = testStringW
+        else:
+            if testPath != "":
+                with open(testPath, 'r') as myfile:
+                    inputStr = myfile.read()
+            else:
+                inputStr = testStringC
+        print("Testing is on, therefore learning from predefined string: \n" + inputStr + "\n")
         print("...Reading..." + "\n")
-        inputStr = testString
     else:
         inputStr = raw_input("Enter a string to learn from: ")
     global alphabet
     if readW:
-        alphabet = list(constructDictionary(inputStr))
+        inputStr = re.sub('[^a-zA-Z ]+', '', inputStr.replace("\n"," ")).lower()
+        alphabet = constructDictionary(inputStr.replace("\n"," "))
     else:
-        alphabet = list(constructAlphabet(inputStr))
+        inputStr = re.sub('[^A-Za-z0-9]+', '', inputStr).lower()
+        alphabet = constructAlphabet(inputStr)
     global alphaSize
     alphaSize = len(alphabet)
     buildMatrices()
     read(inputStr)
     npInputs = np.array(inputMatrix)
-    np.random.seed(1345435)
     npWeights = 2 * np.random.random((alphaSize, alphaSize)) - 1
     output = train(npInputs, npWeights)
     while True:
@@ -43,8 +56,8 @@ def main():
             CorWord = "word"
         inputLetter = raw_input("Enter a " + CorWord + ": ")
         if inputLetter != "":
-            printOccurrencesLetter(output, inputLetter, pOccurences)
-            #printOccurrences(output, 0)
+            printOccurrencesLetter(output, inputLetter, pOccurrences)
+            #printOccurrences(output, pOccurences)
             guessNextLetter(output, inputLetter)
 
 
@@ -56,21 +69,16 @@ def setCorW():
     elif readCorW.lower() == "w":
         readW = True
     else:
-        print "Please enter either Y or N"
+        print "Please enter either W or C"
         setCorW()
 
 
 def constructAlphabet(readInput):
-    re.sub('[^A-Za-z0-9]+', '', readInput)
-    alphabet = (set(readInput))
-    return alphabet
+    return list(set(readInput))
 
 
 def constructDictionary(readInput):
-    re.sub('[^A-Za-z0-9]+', '', readInput)
-    alphabet = readInput.split()
-    alphabet = (set(alphabet))
-    return alphabet
+    return list(set(readInput.split()))
 
 
 def buildMatrices():
@@ -121,7 +129,7 @@ def printOccurrences(wghts, greaterThan):
             for j in xrange(0, alphaSize):
                 if inputMatrix[i][j] > greaterThan:
                     print('"' + inputs[i][j][0] + '"' + ", " + '"' + inputs[i][j][1] + '"'
-                        + " Occurrences: " + str(inputMatrix[i][j]) + ", Weight: " + str(wghts[i][j]))
+                        + " Occurrences: " + str(inputMatrix[i][j]) + ", Probability: " + str(wghts[i][j]))
     except:
         pass
 
@@ -132,7 +140,7 @@ def printOccurrencesLetter(wghts, inputLetter, greaterThan):
         for j in xrange(0, alphaSize):
             if inputMatrix[i][j] > greaterThan:
                 print('"' + inputs[i][j][0] + '"' + ", " + '"' + inputs[i][j][1] + '"'
-                    + " Occurrences: " + str(inputMatrix[i][j]) + ", Weight: " + str(wghts[i][j]))
+                    + " Occurrences: " + str(inputMatrix[i][j]) + ", Probability: " + str(wghts[i][j]))
     except:
         pass
 
@@ -143,23 +151,17 @@ def guessNextLetter(l1, input):
     if input in alphabet:
         i = alphabet.index(input)
         for j in xrange(0, alphaSize):
-            if l1[i][j] > currHighest:
-                currHighest = l1[i][j]
+            if (l1[i][j] * inputMatrix[i][j]) > currHighest:
+                currHighest = l1[i][j] * inputMatrix[i][j]
                 guessed = inputs[i][j][1]
     else:
         for i in xrange(0, alphaSize):
             for j in xrange(0, alphaSize):
-                if l1[i][j] > currHighest:
-                    currHighest = l1[i][j]
+                if (l1[i][j] * inputMatrix[i][j]) > currHighest:
+                    currHighest = l1[i][j] * inputMatrix[i][j]
                     guessed = inputs[i][j][1]
     print("Guess: " + '"' + guessed + '"' + "\n")
 
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
