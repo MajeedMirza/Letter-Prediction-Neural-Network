@@ -105,9 +105,7 @@ def train(npInputs, npWeights):
         l1 = nonlin(np.dot(l0, npWeights))
         l1_error = npInputs - l1
         l1_delta = l1_error * nonlin(l1, True)
-        print(np.dot(l0.T, l1_delta))
         npWeights += np.dot(l0.T, l1_delta)
-
     return l1
 
 
