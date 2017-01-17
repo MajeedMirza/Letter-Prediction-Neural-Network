@@ -1,9 +1,9 @@
 import numpy as np
 import re
 
-testing = True
+testing = False
 testString = "abcdefghijklmnopqrstuvwxyz "
-with open('/Users/mmirza/Desktop/test2.txt', 'r') as myfile:
+with open('FILEPATH.txt', 'r') as myfile:
     testString=myfile.read()
 alphabet = []
 alphaSize = 0
