@@ -1,16 +1,16 @@
 import numpy as np
 import re
 
-testing = False
+testing = True
 testString = "abcdefghijklmnopqrstuvwxyz "
-with open('FILEPATH.txt', 'r') as myfile:
-    testString=myfile.read()
+#with open('FILEPATH.txt', 'r') as myfile:
+#    testString=myfile.read()
 alphabet = []
 alphaSize = 0
 inputs = []
 inputMatrix = []
 npWeights = np.array([])
-trainNum = 1
+trainNum = 100
 pOccurences = -1
 readW = True
 
@@ -18,7 +18,8 @@ def main():
     setCorW()
     inputStr = "  "
     if testing == True:
-        print("Learning from string: " + testString + "\n")
+
+        print("Testing is on, therefore learning from predefined string: \n" + testString + "\n")
         print("...Reading..." + "\n")
         inputStr = testString
     else:
